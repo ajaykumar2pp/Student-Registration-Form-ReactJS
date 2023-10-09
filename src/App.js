@@ -7,6 +7,7 @@ import { BsPlusLg } from "react-icons/bs";
 import Table from 'react-bootstrap/Table';
 import { IoTrashBin } from "react-icons/io5";
 import { FaPen } from "react-icons/fa";
+import StudentSearch from './StudentSearch';
 
 
 
@@ -17,10 +18,15 @@ function App() {
   const [showUpdate, setShowUpdate] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchError, setSearchError] = useState('');
 
   const handleCloseForm = () => setShowForm(false);
   const handleShowForm = () => setShowForm(true);
-  const handleClose= () => setEditIndex(false);
+  const handleClose = () => {
+    setEditIndex(null);
+    setShowUpdate(false);
+  };
 
 
   useEffect(() => {
@@ -54,21 +60,7 @@ function App() {
     setSelectedStudent(formData[index]);
     setShowUpdate(true);
   };
-  // const updateFormData = (data) => {
-  //   if (editIndex !== null) {
-  //     // Update existing data
-  //     formData[editIndex] = data;
-  //   } else {
-  //     // Create new data
-  //     setFormData([...formData, data]);
-  //   }
 
-  //   // Clear editIndex
-  //   setEditIndex(null);
-
-  //   // Update local storage
-  //   localStorage.setItem('studentData', JSON.stringify(formData));
-  // };
 
   const deleteData = (index) => {
     const newData = [...formData];
@@ -78,10 +70,27 @@ function App() {
     // Update local storage after deletion
     localStorage.setItem('studentData', JSON.stringify(newData));
   };
+  
+  const performSearch = (searchTerm) => {
+    console.log(`Searching for students with term: ${searchTerm}`);
+    // Perform the search logic to filter students based on the search term
+    const results = formData.filter((student) =>
+      student.studentName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
+    // Update searchResults and searchError based on the results
+    if (results.length > 0) {
+      setSearchResults(results);
+      setSearchError('');
+    } else {
+      setSearchResults([]);
+      setSearchError('Student not found');
+    }
+  };
 
   return (
     <>
+
       <nav className="navbar bg-light py-3">
         <div className="container">
           <div >
@@ -103,9 +112,18 @@ function App() {
       </nav>
 
       <div className="container-fluid">
+        <div className="row">
+          <div className="col-md-4">
+          <StudentSearch onSearch={performSearch} />
+          </div>
+        </div>
         <div className="row justify-content-center ">
           <div className="col-md-12">
-            <Table striped bordered hover responsive="sm">
+            
+            {searchError ? (
+              <h2 className="text-danger text-center">{searchError}</h2>
+            ) : (
+              <Table striped bordered hover responsive="sm">
               <thead className='text-center'>
                 <tr>
                   <th>Student Name</th>
@@ -131,10 +149,10 @@ function App() {
                     <td>{data.address}</td>
                     <td>
                       <div className=' shadow-sm' >
-                        <Button variant='me-3 text-primary' 
-                        onClick={() => handleEdit(index)} 
+                        <Button variant='me-3 text-primary'
+                          onClick={() => handleEdit(index)}
                         >
-                           {/* onClick={() => setShowUpdate(true)}> */}
+                          {/* onClick={() => setShowUpdate(true)}> */}
                           <FaPen />
                         </Button>
                         <Button variant='text-danger' onClick={() => deleteData(index)} >
@@ -146,8 +164,10 @@ function App() {
                 ))}
               </tbody>
             </Table>
+            )}
+           
 
-            <StudentUpdate handleClose={() => setShowUpdate(false)} show={showUpdate} onUpdate={updateStudentData} studentData={selectedStudent} />
+            <StudentUpdate handleClose={handleClose} show={showUpdate} onUpdate={updateStudentData} studentData={selectedStudent} />
           </div>
         </div>
       </div>
