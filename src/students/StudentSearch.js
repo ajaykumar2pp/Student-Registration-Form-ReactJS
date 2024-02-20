@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { debounce } from './debounce';
+import { debounce } from '../debounce';
 const StudentSearch = ({ onSearch }) => {
 
     const [searchTerm, setSearchTerm] = useState('');

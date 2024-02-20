@@ -19,5 +19,8 @@ export const validationSchema  = Yup.object({
   email:Yup.string().email('Invalid email format').required("Email is must"),
   phone: Yup.string().matches(/^\d{10}$/, 'Phone Number must be 10 digits').required('Phone Number is required'),
   address: Yup.string().required('Address is required'),
+  imageFile: Yup.mixed().test('fileRequired', 'Image is required', (value) => {
+    return value !== undefined;
+  }),
 })
   

@@ -2,12 +2,14 @@ import React from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import './StudentAdd.css';
-import { validationSchema } from './StudentSchema';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { validationSchema } from '../validation/StudentSchema';
 
-const StudentAdd = ({ show, handleClose, onSubmit }) => {
-  
-    const { handleChange, handleSubmit, handleBlur, touched, values, errors } = useFormik({
-        initialValues: {
+const StudentUpdate = ({ show, handleClose, onUpdate, studentData  }) => {
+    
+    const { handleChange, handleSubmit, handleBlur, touched, values, errors, setFieldValue } = useFormik({
+        initialValues: studentData || {
             studentName: '',
             date: '',
             gender: '',
@@ -16,38 +18,29 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
             email: '',
             phone: '',
             address: '',
-
+            imageFile: null,
         },
         validationSchema,
         onSubmit: (values, action) => {
-            console.log(values);
-            // console.log(values.studentName);
-            // console.log(values.date);
-            // console.log(values.gender);
-            // console.log(values.fatherName);
-            // console.log(values.motherName);
-            // console.log(values.email);
-            // console.log(values.phone);
-            // console.log(values.address);
-            // Update studentData state with form values
-          
-           
-            onSubmit(values);
+            // console.log(values)
+            onUpdate(values);
+            toast.success("Student Update Successfully ");
             action.resetForm();
             handleClose();
+
         },
     });
-
-
 
     return (
         <Modal show={show} onHide={handleClose} size='lg'>
             <Modal.Header closeButton>
-                <Modal.Title>Student Details</Modal.Title>
+                <Modal.Title>Update Student Details</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group controlId="studentName">
+
+                    {/* student name */}
+                    <Form.Group controlId="studentName" className='mb-2'>
                         <Form.Label>Student Name</Form.Label>
                         <Form.Control
                             type="text"
@@ -62,7 +55,8 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                         </Form.Control.Feedback>
                     </Form.Group>
 
-                    <Form.Group controlId="date">
+                    {/* student dob */}
+                    <Form.Group controlId="date" className='mb-2'>
                         <Form.Label>Date of Birth</Form.Label>
                         <Form.Control
                             type="date"
@@ -77,7 +71,8 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                         </Form.Control.Feedback>
                     </Form.Group>
 
-                    <Form.Group controlId="gender">
+                    {/* student gender */}
+                    <Form.Group controlId="gender" className='mb-2'>
                         <Form.Label>Gender</Form.Label>
                         <div className="radio-options">
                             <Form.Check
@@ -112,13 +107,15 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                             {errors.gender}
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     {/* Father Name */}
-                    <Form.Group controlId="fatherName">
+                    <Form.Group controlId="fatherName" className='mb-2'>
                         <Form.Label>Father Name</Form.Label>
                         <Form.Control
                             type="text"
                             name="fatherName"
                             value={values.fatherName}
+                            // value={updatedData.fatherName}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             isInvalid={touched.fatherName && errors.fatherName}
@@ -127,8 +124,9 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                             {errors.fatherName}
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     {/* Mother Name */}
-                    <Form.Group controlId="motherName">
+                    <Form.Group controlId="motherName" className='mb-2'>
                         <Form.Label>Mother Name</Form.Label>
                         <Form.Control
                             type="text"
@@ -142,8 +140,9 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                             {errors.motherName}
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     {/* ******* Email Id **** */}
-                    <Form.Group controlId="emailId">
+                    <Form.Group controlId="emailId" className='mb-2'>
                         <Form.Label>Email Id</Form.Label>
                         <Form.Control
                             type="text"
@@ -157,8 +156,9 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                             {errors.email}
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     {/***  Phone Number  ********* */}
-                    <Form.Group controlId="phone">
+                    <Form.Group controlId="phone" className='mb-2'>
                         <Form.Label>Phone Number</Form.Label>
                         <Form.Control
                             type="number"
@@ -172,8 +172,9 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                             {errors.phone}
                         </Form.Control.Feedback>
                     </Form.Group>
+
                     {/**************  Address ******* */}
-                    <Form.Group controlId="phone">
+                    <Form.Group controlId="address" className='mb-2'>
                         <Form.Label>Address</Form.Label>
                         <Form.Control
                             type="text"
@@ -187,6 +188,28 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
                             {errors.address}
                         </Form.Control.Feedback>
                     </Form.Group>
+
+                    {/* student image  */}
+                    <Form.Group controlId="imageFile" className="mb-3" >
+                        <Form.Label>Student Image Upload</Form.Label>
+                        <Form.Control
+                            type="file"
+                            name="imageFile"
+                            onChange={(event) => {
+                                handleChange(event);
+                                if (event.currentTarget.files[0]) {
+                                    setFieldValue('imageFile', event.currentTarget.files[0]);
+                                    handleBlur({ target: { name: 'imageFile' } });
+                                }
+                            }}
+                            isInvalid={touched.imageFile && errors.imageFile}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.imageFile}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+
+
                     <Modal.Footer>
                         <Button variant="primary" type="submit">
                             Submit
@@ -199,7 +222,6 @@ const StudentAdd = ({ show, handleClose, onSubmit }) => {
             </Modal.Body>
         </Modal>
     );
-};
+}
 
-export default StudentAdd;
-
+export default StudentUpdate;
